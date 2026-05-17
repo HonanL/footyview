@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMatch, matches } from "../../matches";
+import { getMatch, getMatchTitle, matches } from "../../matches";
 
 type MatchPageProps = {
   params: Promise<{
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: MatchPageProps) {
   const match = getMatch(id);
 
   return {
-    title: match ? `${match.teams} | FootyView` : "Match | FootyView",
+    title: match ? `${getMatchTitle(match)} | FootyView` : "Match | FootyView",
   };
 }
 
@@ -31,99 +31,115 @@ export default async function MatchDetailPage({ params }: MatchPageProps) {
     notFound();
   }
 
+  const bestProvider = match.providers.find((provider) => provider.bestOption);
+  const otherProviders = match.providers.filter((provider) => !provider.bestOption);
+  const statusColor = match.status === "EN DIRECT" ? "text-green-400" : "text-sky-300";
+  const statusBorder = match.status === "EN DIRECT" ? "border-green-400/40" : "border-sky-300/40";
+
   return (
     <main className="min-h-screen bg-black text-white">
-      <section className="min-h-screen px-8 py-7 sm:px-12 lg:px-16">
-        <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-7xl flex-col">
-          <header className="flex items-center justify-between gap-6">
-            <Link
-              href="/"
-              className="rounded-lg border border-white/15 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-zinc-200 outline-none transition hover:border-green-400 focus:border-green-400 focus:ring-4 focus:ring-green-400/25"
-            >
-              Retour
-            </Link>
-            <div className="text-right">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-green-400">
-                {match.status}
-              </p>
-              <p className="mt-1 text-2xl font-black">{match.minute}</p>
-            </div>
-          </header>
+      <section className="mx-auto flex min-h-screen max-w-7xl flex-col px-8 py-8 sm:px-12 lg:px-16">
+        <header className="flex items-center justify-between gap-8">
+          <Link
+            href="/"
+            className="rounded-lg border border-white/20 px-7 py-4 text-xl font-black outline-none transition hover:border-white focus:border-green-400 focus:ring-4 focus:ring-green-400/25"
+          >
+            Retour
+          </Link>
 
-          <div className="grid flex-1 items-center gap-8 py-10 lg:grid-cols-[1.3fr_0.7fr]">
-            <section className="rounded-lg border border-white/10 bg-zinc-950 p-8 shadow-2xl shadow-green-950/20 sm:p-10">
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-zinc-500">
-                {match.competition}
-              </p>
-
-              <div className="mt-8 grid items-center gap-6 sm:grid-cols-[1fr_auto_1fr]">
-                <h1 className="text-5xl font-black leading-none sm:text-6xl lg:text-7xl">
-                  {match.homeTeam}
-                </h1>
-                <div className="rounded-lg bg-white px-6 py-4 text-center text-5xl font-black text-black sm:text-6xl">
-                  {match.score}
-                </div>
-                <h2 className="text-5xl font-black leading-none sm:text-right sm:text-6xl lg:text-7xl">
-                  {match.awayTeam}
-                </h2>
-              </div>
-
-              <div className="mt-10 grid gap-4 text-lg text-zinc-300 sm:grid-cols-3">
-                <div className="rounded-lg bg-zinc-900 p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-                    Stade
-                  </p>
-                  <p className="mt-2 font-semibold">{match.stadium}</p>
-                </div>
-                <div className="rounded-lg bg-zinc-900 p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-                    Diffusion
-                  </p>
-                  <p className="mt-2 font-semibold">{match.channel}</p>
-                </div>
-                <div className="rounded-lg bg-zinc-900 p-5">
-                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">
-                    Ambiance
-                  </p>
-                  <p className="mt-2 font-semibold">{match.mood}</p>
-                </div>
-              </div>
-            </section>
-
-            <aside className="grid gap-6">
-              <section className="rounded-lg border border-white/10 bg-zinc-950 p-6">
-                <h3 className="text-2xl font-black">Temps forts</h3>
-                <div className="mt-5 space-y-3">
-                  {match.timeline.map((event) => (
-                    <p
-                      key={event}
-                      className="rounded-lg bg-zinc-900 px-4 py-3 text-lg font-semibold text-zinc-100"
-                    >
-                      {event}
-                    </p>
-                  ))}
-                </div>
-              </section>
-
-              <section className="rounded-lg border border-white/10 bg-zinc-950 p-6">
-                <h3 className="text-2xl font-black">Statistiques</h3>
-                <dl className="mt-5 grid gap-3">
-                  <div className="flex items-center justify-between rounded-lg bg-zinc-900 px-4 py-3">
-                    <dt className="text-zinc-400">Possession</dt>
-                    <dd className="text-xl font-black">{match.stats.possession}</dd>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-zinc-900 px-4 py-3">
-                    <dt className="text-zinc-400">Tirs</dt>
-                    <dd className="text-xl font-black">{match.stats.shots}</dd>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-zinc-900 px-4 py-3">
-                    <dt className="text-zinc-400">Corners</dt>
-                    <dd className="text-xl font-black">{match.stats.corners}</dd>
-                  </div>
-                </dl>
-              </section>
-            </aside>
+          <div className={`rounded-lg border ${statusBorder} bg-zinc-950 px-7 py-4 text-right`}>
+            <p className={`text-2xl font-black ${statusColor}`}>{match.status}</p>
+            <p className="mt-1 text-lg font-semibold text-zinc-400">
+              {match.status === "EN DIRECT" ? "Minute" : "Début"} {match.minute}
+            </p>
           </div>
+        </header>
+
+        <div className="grid flex-1 content-center gap-10 py-12">
+          <section className="rounded-lg border border-white/10 bg-zinc-950 p-8 sm:p-12 lg:p-14">
+            <p className="text-2xl font-black uppercase tracking-[0.24em] text-zinc-500">
+              {match.league}
+            </p>
+
+            <div className="mt-12 grid items-center gap-8 lg:grid-cols-[1fr_auto_1fr]">
+              <h1 className="text-6xl font-black leading-none sm:text-7xl lg:text-8xl">
+                {match.homeTeam}
+              </h1>
+
+              <p className="text-center text-4xl font-black text-zinc-500 lg:text-5xl">VS</p>
+
+              <h2 className="text-6xl font-black leading-none sm:text-7xl lg:text-right lg:text-8xl">
+                {match.awayTeam}
+              </h2>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-white/10 bg-zinc-950 p-8 sm:p-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xl font-black uppercase tracking-[0.22em] text-zinc-500">
+                  Où regarder
+                </p>
+                <h3 className="mt-4 text-4xl font-black sm:text-5xl">Choix de diffusion</h3>
+              </div>
+              <p className="text-xl font-semibold text-zinc-400">France</p>
+            </div>
+
+            {bestProvider ? (
+              <div className="mt-8">
+                <p className="mb-4 text-lg font-black uppercase tracking-[0.2em] text-green-400">
+                  Meilleure option
+                </p>
+                <article className="rounded-lg border border-green-400/60 bg-green-400/10 p-7 shadow-2xl shadow-green-950/40 sm:p-8">
+                  <div className="grid gap-6 lg:grid-cols-[1fr_auto_auto] lg:items-center">
+                    <h4 className="text-4xl font-black sm:text-5xl">{bestProvider.name}</h4>
+                    <div>
+                      <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">
+                        Qualité
+                      </p>
+                      <p className="mt-2 text-2xl font-black">{bestProvider.quality}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">
+                        Abonnement
+                      </p>
+                      <p className="mt-2 text-2xl font-black">{bestProvider.subscription}</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            ) : null}
+
+            <div className="mt-8">
+              <p className="mb-4 text-lg font-black uppercase tracking-[0.2em] text-zinc-500">
+                Autres options
+              </p>
+              <div className="grid gap-5 lg:grid-cols-2">
+                {otherProviders.map((provider) => (
+                  <article
+                    key={provider.name}
+                    className="rounded-lg border border-white/10 bg-zinc-900 p-7"
+                  >
+                    <h4 className="text-3xl font-black">{provider.name}</h4>
+                    <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                      <div>
+                        <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">
+                          Qualité
+                        </p>
+                        <p className="mt-2 text-xl font-black">{provider.quality}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-black uppercase tracking-[0.18em] text-zinc-500">
+                          Abonnement
+                        </p>
+                        <p className="mt-2 text-xl font-black">{provider.subscription}</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </main>
