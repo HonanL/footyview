@@ -1,11 +1,6 @@
-export type MatchStatus = "EN DIRECT" | "À VENIR";
+import type { Provider } from "./utils/rankProviders";
 
-export type Provider = {
-  name: string;
-  quality: string;
-  bestOption: boolean;
-  subscription: string;
-};
+export type MatchStatus = "EN DIRECT" | "À VENIR";
 
 export type Match = {
   id: string;
@@ -31,18 +26,24 @@ export const matches: Match[] = [
         quality: "4K HDR",
         bestOption: true,
         subscription: "Abonnement Sport",
+        subscriptionCost: 29.99,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast", "Console"],
       },
       {
         name: "Amazon Prime Video",
         quality: "Full HD",
         bestOption: false,
         subscription: "Pass Ligue et Sports",
+        subscriptionCost: 14.99,
+        deviceCompatibility: ["TV connectée", "Fire TV", "Chromecast", "Console"],
       },
       {
         name: "beIN Sports",
         quality: "Full HD",
         bestOption: false,
         subscription: "Bouquet beIN Sports",
+        subscriptionCost: 15,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast"],
       },
     ],
   },
@@ -59,18 +60,24 @@ export const matches: Match[] = [
         quality: "4K",
         bestOption: true,
         subscription: "Bouquet beIN Sports",
+        subscriptionCost: 15,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast"],
       },
       {
         name: "Canal+",
         quality: "Full HD",
         bestOption: false,
         subscription: "Pack chaînes sport",
+        subscriptionCost: 29.99,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast", "Console"],
       },
       {
         name: "Amazon Prime Video",
         quality: "Full HD",
         bestOption: false,
         subscription: "Location événement",
+        subscriptionCost: 7.99,
+        deviceCompatibility: ["TV connectée", "Fire TV", "Chromecast", "Console"],
       },
     ],
   },
@@ -87,18 +94,24 @@ export const matches: Match[] = [
         quality: "Full HD 60 i/s",
         bestOption: true,
         subscription: "Abonnement DAZN",
+        subscriptionCost: 14.99,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast", "Console"],
       },
       {
         name: "Canal+",
         quality: "Full HD",
         bestOption: false,
         subscription: "Pack Sport",
+        subscriptionCost: 29.99,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast", "Console"],
       },
       {
         name: "beIN Sports",
         quality: "HD",
         bestOption: false,
         subscription: "Bouquet beIN Sports",
+        subscriptionCost: 15,
+        deviceCompatibility: ["TV connectée", "Apple TV", "Chromecast"],
       },
     ],
   },

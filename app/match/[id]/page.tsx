@@ -1,11 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMatch, getMatchTitle, matches } from "../../matches";
+import { rankProviders, type UserPreferences } from "../../utils/rankProviders";
 
 type MatchPageProps = {
   params: Promise<{
     id: string;
   }>;
+};
+
+const defaultPreferences: UserPreferences = {
+  preferredDevice: "TV connectée",
+  preferFrenchProviders: true,
+  preferPremiumProviders: true,
+  maxSubscriptionCost: 16,
 };
 
 export function generateStaticParams() {
@@ -31,8 +39,8 @@ export default async function MatchDetailPage({ params }: MatchPageProps) {
     notFound();
   }
 
-  const bestProvider = match.providers.find((provider) => provider.bestOption);
-  const otherProviders = match.providers.filter((provider) => !provider.bestOption);
+  const rankedProviders = rankProviders(match.providers, defaultPreferences);
+  const [bestProvider, ...otherProviders] = rankedProviders;
   const statusColor = match.status === "EN DIRECT" ? "text-green-400" : "text-sky-300";
   const statusBorder = match.status === "EN DIRECT" ? "border-green-400/40" : "border-sky-300/40";
 
@@ -80,15 +88,15 @@ export default async function MatchDetailPage({ params }: MatchPageProps) {
                 <p className="text-xl font-black uppercase tracking-[0.22em] text-zinc-500">
                   Où regarder
                 </p>
-                <h3 className="mt-4 text-4xl font-black sm:text-5xl">Choix de diffusion</h3>
+                <h3 className="mt-4 text-4xl font-black sm:text-5xl">Recommandation intelligente</h3>
               </div>
-              <p className="text-xl font-semibold text-zinc-400">France</p>
+              <p className="text-xl font-semibold text-zinc-400">France · TV connectée</p>
             </div>
 
             {bestProvider ? (
               <div className="mt-8">
                 <p className="mb-4 text-lg font-black uppercase tracking-[0.2em] text-green-400">
-                  Meilleure option
+                  ⭐ Meilleure option
                 </p>
                 <article className="rounded-lg border border-green-400/60 bg-green-400/10 p-7 shadow-2xl shadow-green-950/40 sm:p-8">
                   <div className="grid gap-6 lg:grid-cols-[1fr_auto_auto] lg:items-center">
