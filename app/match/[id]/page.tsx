@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { TeamFavoriteButton } from "../../components/TeamFavoriteButton";
 import { getMatch, getMatchTitle, matches } from "../../matches";
 import { rankProviders, type UserPreferences } from "../../utils/rankProviders";
 
@@ -79,6 +80,16 @@ export default async function MatchDetailPage({ params }: MatchPageProps) {
               <h2 className="text-6xl font-black leading-none sm:text-7xl lg:text-right lg:text-8xl">
                 {match.awayTeam}
               </h2>
+            </div>
+
+            <div className="mt-12 rounded-lg border border-white/10 bg-black/30 p-6">
+              <p className="text-xl font-black uppercase tracking-[0.2em] text-zinc-500">
+                Équipes favorites
+              </p>
+              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <TeamFavoriteButton team={match.homeTeam} variant="large" />
+                <TeamFavoriteButton team={match.awayTeam} variant="large" />
+              </div>
             </div>
           </section>
 
