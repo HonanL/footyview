@@ -8,9 +8,10 @@ import { TeamFavoriteButton } from "./TeamFavoriteButton";
 
 type HomePageClientProps = {
   matches: Match[];
+  errorMessage?: string;
 };
 
-export function HomePageClient({ matches }: HomePageClientProps) {
+export function HomePageClient({ matches, errorMessage }: HomePageClientProps) {
   const { favoriteTeams, isFavoriteMatch, sortMatchesByFavorites } = useFavorites();
   const sortedMatches = sortMatchesByFavorites(matches);
 
@@ -36,49 +37,69 @@ export function HomePageClient({ matches }: HomePageClientProps) {
         )}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {sortedMatches.map((match) => {
-          const favoriteMatch = isFavoriteMatch(match);
+      {errorMessage ? (
+        <section className="mb-8 rounded-lg border border-red-400/40 bg-red-950/30 p-7">
+          <h2 className="text-3xl font-black text-red-200">Données indisponibles</h2>
+          <p className="mt-3 text-xl font-semibold text-red-100">{errorMessage}</p>
+        </section>
+      ) : null}
 
-          return (
-            <article
-              key={match.id}
-              className={`rounded-lg border p-7 transition ${
-                favoriteMatch
-                  ? "border-yellow-300/60 bg-yellow-300/10 shadow-2xl shadow-yellow-950/30"
-                  : "border-white/10 bg-zinc-900"
-              }`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <p className="mb-5 text-xl font-black text-green-400">
-                  {match.status} {match.minute}
-                </p>
-                {favoriteMatch ? (
-                  <p className="rounded-lg bg-yellow-300 px-3 py-2 text-sm font-black uppercase tracking-wide text-black">
-                    Favori
-                  </p>
-                ) : null}
-              </div>
+      {sortedMatches.length === 0 ? (
+        <section className="rounded-lg border border-white/10 bg-zinc-950 p-10 text-center">
+          <h2 className="text-4xl font-black">Aucun match disponible</h2>
+          <p className="mt-4 text-xl font-semibold text-zinc-400">
+            Revenez bientôt pour les matchs en direct et à venir.
+          </p>
+        </section>
+      ) : (
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {sortedMatches.map((match) => {
+            const favoriteMatch = isFavoriteMatch(match);
 
-              <Link
-                href={`/match/${match.id}`}
-                className="block rounded-lg outline-none transition hover:text-green-300 focus:ring-4 focus:ring-green-400/25"
+            return (
+              <article
+                key={match.id}
+                className={`rounded-lg border p-7 transition ${
+                  favoriteMatch
+                    ? "border-yellow-300/60 bg-yellow-300/10 shadow-2xl shadow-yellow-950/30"
+                    : "border-white/10 bg-zinc-900"
+                }`}
               >
-                <h3 className="text-3xl font-black">{getMatchTitle(match)}</h3>
-                <p className="mt-4 text-lg font-semibold text-zinc-400">{match.league}</p>
-                <p className="mt-8 text-sm font-bold uppercase tracking-wide text-zinc-500">
-                  Voir la fiche match
-                </p>
-              </Link>
+                <div className="flex items-start justify-between gap-4">
+                  <p
+                    className={`mb-5 text-xl font-black ${
+                      match.status === "EN DIRECT" ? "text-green-400" : "text-sky-300"
+                    }`}
+                  >
+                    {match.status} {match.minute}
+                  </p>
+                  {favoriteMatch ? (
+                    <p className="rounded-lg bg-yellow-300 px-3 py-2 text-sm font-black uppercase tracking-wide text-black">
+                      Favori
+                    </p>
+                  ) : null}
+                </div>
 
-              <div className="mt-7 grid gap-3">
-                <TeamFavoriteButton team={match.homeTeam} variant="large" />
-                <TeamFavoriteButton team={match.awayTeam} variant="large" />
-              </div>
-            </article>
-          );
-        })}
-      </section>
+                <Link
+                  href={`/match/${match.id}`}
+                  className="block rounded-lg outline-none transition hover:text-green-300 focus:ring-4 focus:ring-green-400/25"
+                >
+                  <h3 className="text-3xl font-black">{getMatchTitle(match)}</h3>
+                  <p className="mt-4 text-lg font-semibold text-zinc-400">{match.league}</p>
+                  <p className="mt-8 text-sm font-bold uppercase tracking-wide text-zinc-500">
+                    Voir la fiche match
+                  </p>
+                </Link>
+
+                <div className="mt-7 grid gap-3">
+                  <TeamFavoriteButton team={match.homeTeam} variant="large" />
+                  <TeamFavoriteButton team={match.awayTeam} variant="large" />
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      )}
     </main>
   );
 }

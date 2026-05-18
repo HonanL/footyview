@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TeamFavoriteButton } from "../../components/TeamFavoriteButton";
-import { getMatch, getMatchTitle, matches } from "../../matches";
+import { getMatch, getMatchTitle, matches, type Match } from "../../matches";
+import { fetchMatchById } from "../../services/apiFootball";
 import { rankProviders, type UserPreferences } from "../../utils/rankProviders";
 
 type MatchPageProps = {
@@ -17,6 +18,22 @@ const defaultPreferences: UserPreferences = {
   maxSubscriptionCost: 16,
 };
 
+async function resolveMatch(id: string): Promise<Match | undefined> {
+  const staticMatch = getMatch(id);
+
+  if (staticMatch) {
+    return staticMatch;
+  }
+
+  if (!/^\d+$/.test(id)) {
+    return undefined;
+  }
+
+  const apiMatch = await fetchMatchById(id);
+
+  return apiMatch.ok && apiMatch.data ? apiMatch.data : undefined;
+}
+
 export function generateStaticParams() {
   return matches.map((match) => ({
     id: match.id,
@@ -25,7 +42,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: MatchPageProps) {
   const { id } = await params;
-  const match = getMatch(id);
+  const match = await resolveMatch(id);
 
   return {
     title: match ? `${getMatchTitle(match)} | FootyView` : "Match | FootyView",
@@ -34,7 +51,7 @@ export async function generateMetadata({ params }: MatchPageProps) {
 
 export default async function MatchDetailPage({ params }: MatchPageProps) {
   const { id } = await params;
-  const match = getMatch(id);
+  const match = await resolveMatch(id);
 
   if (!match) {
     notFound();
