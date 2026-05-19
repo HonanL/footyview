@@ -138,6 +138,19 @@ function getMatchMinute(fixture: ApiFootballFixture["fixture"]) {
   }).format(new Date(fixture.date));
 }
 
+function getCurrentFootballSeason(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+
+  return month >= 6 ? year : year - 1;
+}
+
+function isFinishedFixture(fixture: ApiFootballFixture) {
+  const finishedStatuses = new Set(["FT", "AET", "PEN"]);
+
+  return finishedStatuses.has(fixture.fixture.status.short);
+}
+
 function normalizeFixture(fixture: ApiFootballFixture): Match {
   return {
     id: String(fixture.fixture.id),
@@ -184,19 +197,28 @@ export function fetchLiveMatches() {
 export function fetchUpcomingMatches(limit = 9) {
   return safelyFetchMatches(async () => {
     const today = new Date();
-    const thirtyDaysFromToday = new Date(today);
+    const ninetyDaysFromToday = new Date(today);
 
-    thirtyDaysFromToday.setDate(today.getDate() + 30);
+    ninetyDaysFromToday.setDate(today.getDate() + 90);
 
     const from = today.toISOString().slice(0, 10);
-    const to = thirtyDaysFromToday.toISOString().slice(0, 10);
+    const to = ninetyDaysFromToday.toISOString().slice(0, 10);
     const payload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", {
       team: 85,
       from,
       to,
+      season: getCurrentFootballSeason(today),
     });
 
-    return payload.response.slice(0, limit).map(normalizeFixture);
+    return payload.response
+      .filter((fixture) => !isFinishedFixture(fixture))
+      .sort(
+        (firstFixture, secondFixture) =>
+          new Date(firstFixture.fixture.date).getTime() -
+          new Date(secondFixture.fixture.date).getTime(),
+      )
+      .slice(0, limit)
+      .map(normalizeFixture);
   });
 }
 
