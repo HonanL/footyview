@@ -5,8 +5,10 @@ export default async function Home() {
   const result = await fetchHomepageMatches();
 
   if (!result.ok) {
-    return <HomePageClient matches={[]} errorMessage={result.error} />;
+    return <HomePageClient errorMessage={result.error} />;
   }
 
-  return <HomePageClient matches={result.data} />;
+  const matches = result.data;
+
+  return <HomePageClient match={matches[0]} />;
 }

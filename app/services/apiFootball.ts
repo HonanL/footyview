@@ -147,6 +147,7 @@ function normalizeFixture(fixture: ApiFootballFixture): Match {
     awayTeam: fixture.teams.away.name,
     status: getMatchStatus(fixture.fixture.status),
     minute: getMatchMinute(fixture.fixture),
+    date: fixture.fixture.date,
     providers: getDefaultProviders(fixture.league.name),
   };
 }
@@ -173,6 +174,7 @@ export function fetchLiveMatches() {
   return safelyFetchMatches(async () => {
     const payload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", {
       live: "all",
+      team: 85,
     });
 
     return payload.response.map(normalizeFixture);
@@ -183,6 +185,7 @@ export function fetchUpcomingMatches(limit = 9) {
   return safelyFetchMatches(async () => {
     const payload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", {
       next: limit,
+      team: 85,
     });
 
     return payload.response.map(normalizeFixture);

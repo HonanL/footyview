@@ -10,6 +10,7 @@ export type Match = {
   awayTeam: string;
   status: MatchStatus;
   minute: string;
+  date: string;
   providers: Provider[];
 };
 
@@ -109,6 +110,7 @@ export const matches: Match[] = [
     awayTeam: "Chelsea",
     status: "EN DIRECT",
     minute: "67'",
+    date: "2026-05-18T20:00:00+00:00",
     providers: getDefaultProviders("Premier League"),
   },
   {
@@ -119,6 +121,7 @@ export const matches: Match[] = [
     awayTeam: "Real Madrid",
     status: "EN DIRECT",
     minute: "51'",
+    date: "2026-05-18T19:30:00+00:00",
     providers: getDefaultProviders("LaLiga"),
   },
   {
@@ -129,6 +132,7 @@ export const matches: Match[] = [
     awayTeam: "AC Milan",
     status: "À VENIR",
     minute: "20:45",
+    date: "2026-05-18T19:45:00+00:00",
     providers: getDefaultProviders("Serie A"),
   },
 ];
