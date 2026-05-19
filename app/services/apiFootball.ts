@@ -183,12 +183,20 @@ export function fetchLiveMatches() {
 
 export function fetchUpcomingMatches(limit = 9) {
   return safelyFetchMatches(async () => {
+    const today = new Date();
+    const thirtyDaysFromToday = new Date(today);
+
+    thirtyDaysFromToday.setDate(today.getDate() + 30);
+
+    const from = today.toISOString().slice(0, 10);
+    const to = thirtyDaysFromToday.toISOString().slice(0, 10);
     const payload = await fetchApiFootball<ApiFootballFixture[]>("/fixtures", {
-      next: limit,
       team: 85,
+      from,
+      to,
     });
 
-    return payload.response.map(normalizeFixture);
+    return payload.response.slice(0, limit).map(normalizeFixture);
   });
 }
 
